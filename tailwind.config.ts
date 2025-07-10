@@ -63,6 +63,22 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
+			fontFamily: {
+				'cyber': ['Orbitron', 'monospace'],
+				'mono': ['JetBrains Mono', 'monospace'],
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-secondary': 'var(--gradient-secondary)',
+				'gradient-background': 'var(--gradient-background)',
+				'gradient-card': 'var(--gradient-card)',
+			},
+			boxShadow: {
+				'glow': 'var(--shadow-glow)',
+				'glow-secondary': 'var(--shadow-glow-secondary)',
+				'glow-accent': 'var(--shadow-glow-accent)',
+				'card': 'var(--shadow-card)',
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
