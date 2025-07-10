@@ -3,6 +3,7 @@ import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { TypingIndicator } from "./TypingIndicator";
 import { getRandomResponse, getTypingDelay } from "@/utils/fakeResponses";
+import { createPromptSession } from "@/lib/promptapi";
 
 interface Message {
   id: string;
@@ -16,10 +17,22 @@ export const ChatInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [promptApiReady, setPromptApiRead] = useState(false);
+  const [promptSession, setPromptSession] = useState<LanguageModel | null>(
+    null,
+  );
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    createPromptSession("You are a friendly, helpful assistant.").then(
+      (session) => {
+        setPromptSession(session);
+      },
+    );
+  }, [promptSession, promptApiReady]);
 
   useEffect(() => {
     scrollToBottom();
@@ -31,7 +44,7 @@ export const ChatInterface = () => {
       id: "welcome",
       text: "Neural interface initialized. Welcome to the digital consciousness matrix. How may I assist your journey through the data streams?",
       isUser: false,
-      timestamp: new Date().toLocaleTimeString()
+      timestamp: new Date().toLocaleTimeString(),
     };
     setMessages([welcomeMessage]);
   }, []);
@@ -41,29 +54,29 @@ export const ChatInterface = () => {
       id: Date.now().toString(),
       text,
       isUser: true,
-      timestamp: new Date().toLocaleTimeString()
+      timestamp: new Date().toLocaleTimeString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
     setShowTyping(true);
 
+    const response = await promptSession.prompt(text);
+
     // Simulate AI thinking time
     const delay = getTypingDelay();
-    
-    setTimeout(() => {
-      setShowTyping(false);
-      
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: getRandomResponse(),
-        isUser: false,
-        timestamp: new Date().toLocaleTimeString()
-      };
 
-      setMessages(prev => [...prev, aiResponse]);
-      setIsLoading(false);
-    }, delay);
+    setShowTyping(false);
+
+    const aiResponse: Message = {
+      id: (Date.now() + 1).toString(),
+      text: response,
+      isUser: false,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+
+    setMessages((prev) => [...prev, aiResponse]);
+    setIsLoading(false);
   };
 
   return (
@@ -78,12 +91,12 @@ export const ChatInterface = () => {
               timestamp={message.timestamp}
             />
           ))}
-          
+
           {showTyping && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
       </div>
-      
+
       <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
     </div>
   );
