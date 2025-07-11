@@ -2,7 +2,7 @@
   "name": "Friendly local ChatBot",
   "short_name": "Local ChatBot",
   "description": "A simple ChatBot that runs locally and works offline",
-  "start_url": "/",
+  "start_url": "/friendly-local-chatbot/",
   "display": "standalone",
   "background_color": "#051525",
   "theme_color": "#00ff00",
