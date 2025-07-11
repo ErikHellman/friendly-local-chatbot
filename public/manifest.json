@@ -1,7 +1,7 @@
 {
-  "name": "Neural AI - Cyberpunk Chat Interface",
-  "short_name": "Neural.AI",
-  "description": "A cyberpunk-styled AI chat interface inspired by Neuromancer",
+  "name": "Friendly local ChatBot",
+  "short_name": "Local ChatBot",
+  "description": "A simple ChatBot that runs locally and works offline",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#051525",
@@ -14,7 +14,7 @@
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png", 
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
