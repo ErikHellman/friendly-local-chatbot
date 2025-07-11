@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
-import { TypingIndicator } from "./TypingIndicator";
-import { getRandomResponse, getTypingDelay } from "@/utils/fakeResponses";
 import { createPromptSession } from "@/lib/promptapi";
+
+type LanguageModel = unknown;
 
 interface Message {
   id: string;
-  text: string;
+  text: string | ReadableStream<string>;
   isUser: boolean;
   timestamp: string;
 }
@@ -15,9 +15,7 @@ interface Message {
 export const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showTyping, setShowTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [promptApiReady, setPromptApiRead] = useState(false);
   const [promptSession, setPromptSession] = useState<LanguageModel | null>(
     null,
   );
@@ -27,27 +25,35 @@ export const ChatInterface = () => {
   };
 
   useEffect(() => {
-    createPromptSession("You are a friendly, helpful assistant.").then(
-      (session) => {
-        setPromptSession(session);
-      },
-    );
-  }, [promptSession, promptApiReady]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, showTyping]);
-
-  useEffect(() => {
-    // Welcome message
+    setIsLoading(true);
     const welcomeMessage: Message = {
       id: "welcome",
-      text: "Neural interface initialized. Welcome to the digital consciousness matrix. How may I assist your journey through the data streams?",
+      text: "Loading AI models. Please wait...",
       isUser: false,
       timestamp: new Date().toLocaleTimeString(),
     };
     setMessages([welcomeMessage]);
+
+    createPromptSession(
+      "You are a friendly, helpful assistant with a good sense of humor.",
+    ).then((session) => {
+      console.log("Prompt API ready!");
+      const welcomeMessage: Message = {
+        id: "welcome",
+        text: "Welcome to your local AI Chatbot. I run entirely on your device and even work offline. Feel free to ask me anything as I will never remember our coversations.",
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString(),
+      };
+      setMessages([welcomeMessage]);
+
+      setPromptSession(session);
+      setIsLoading(false);
+    });
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async (text: string) => {
     const userMessage: Message = {
@@ -58,25 +64,17 @@ export const ChatInterface = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
-    setShowTyping(true);
 
-    const response = await promptSession.prompt(text);
-
-    // Simulate AI thinking time
-    const delay = getTypingDelay();
-
-    setShowTyping(false);
+    const stream: ReadableStream<string> = promptSession.promptStreaming(text);
 
     const aiResponse: Message = {
       id: (Date.now() + 1).toString(),
-      text: response,
+      text: stream,
       isUser: false,
       timestamp: new Date().toLocaleTimeString(),
     };
 
     setMessages((prev) => [...prev, aiResponse]);
-    setIsLoading(false);
   };
 
   return (
@@ -92,7 +90,6 @@ export const ChatInterface = () => {
             />
           ))}
 
-          {showTyping && <TypingIndicator />}
           <div ref={messagesEndRef} />
         </div>
       </div>

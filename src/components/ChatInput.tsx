@@ -29,13 +29,13 @@ export const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
           className="cyber-input flex-1 text-sm sm:text-base"
           disabled={isLoading}
         />
-        
+
         <button
           type="submit"
           disabled={!input.trim() || isLoading}
           className={cn(
             "cyber-button flex items-center justify-center min-w-[48px] h-[48px]",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none",
           )}
         >
           {isLoading ? (
@@ -45,9 +45,9 @@ export const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
           )}
         </button>
       </form>
-      
+
       <div className="text-xs text-muted-foreground text-center mt-2 font-cyber">
-        NEURAL_LINK_ESTABLISHED • ENCRYPTION_ENABLED
+        No prompts are sent over the network.
       </div>
     </div>
   );
